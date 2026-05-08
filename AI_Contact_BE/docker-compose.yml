@@ -43,7 +43,7 @@ services:
             - http://host.docker.internal:8081/calls/livekit/webhook
     command:
       - --bind=0.0.0.0
-      - --node-ip=3.35.17.1  # 🔑 핵심 설정!
+      - --node-ip=52.79.216.119  # 변경
       - --port=8880
     ports:
       - "127.0.0.1:8880:8880"   # 시그널링 (Nginx가 이 포트로 프록시)
