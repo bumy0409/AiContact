@@ -53,7 +53,7 @@ public class SecurityConfig {
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration configuration = new CorsConfiguration();
                 configuration.setAllowedOrigins(List.of(
-                        "https://aicontact-gamma.vercel.app", "http://localhost:5173"));
+                        "https://ai-contact-rho.vercel.app", "http://localhost:5173"));
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 configuration.setAllowedHeaders(Collections.singletonList("*"));
                 configuration.setAllowCredentials(true);
