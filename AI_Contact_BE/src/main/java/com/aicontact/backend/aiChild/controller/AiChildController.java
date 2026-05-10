@@ -72,6 +72,14 @@ public class AiChildController {
                 .ok(ApiResponse.success(new AiChildResponse(updated)));
     }
 
+    @PostMapping("/{id}/regenerate-image")
+    public ResponseEntity<ApiResponse<AiChildResponse>> regenerateImage(
+            @PathVariable("id") Long id
+    ) throws IOException {
+        AiChildEntity updated = aiChildService.regenerateImage(id);
+        return ResponseEntity.ok(ApiResponse.success(new AiChildResponse(updated)));
+    }
+
     @GetMapping("/{id}/grow")
     public ResponseEntity<ApiResponse<AiChildResponse>> growChild(
             @PathVariable("id") Long id

@@ -152,22 +152,33 @@ export default function MainPage() {
               child.growthLevel === 1
             }
             imgVersion={imgVersion}
-            // 성장 버튼 클릭 시 로딩 오버레이 표시/해제
             onGrowClick={async () => {
               if (!child) return;
               try {
-                setGrowing(true); // ← 시작: 오버레이 ON
+                setGrowing(true);
                 await aiChildApi.growChild(child.id);
                 const updated = await aiChildApi.getMyChildren();
                 setChild(updated.data);
-                setImgVersion((v) => v + 1); // 이미지 강제 리렌더
+                setImgVersion((v) => v + 1);
               } catch (err) {
                 console.error("성장 실패:", err);
               } finally {
-                setGrowing(false); // ← 종료: 오버레이 OFF
+                setGrowing(false);
               }
             }}
-            // 성장 중일 때 버튼 비활성화
+            onRegenerateClick={child ? async () => {
+              try {
+                setGrowing(true);
+                await aiChildApi.regenerateImage(child.id);
+                const updated = await aiChildApi.getMyChildren();
+                setChild(updated.data);
+                setImgVersion((v) => v + 1);
+              } catch (err) {
+                console.error("이미지 재생성 실패:", err);
+              } finally {
+                setGrowing(false);
+              }
+            } : undefined}
             isProcessing={growing}
           />
 

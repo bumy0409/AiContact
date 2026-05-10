@@ -154,3 +154,24 @@
   justify-content: center;
   z-index: 2000;
 }
+
+.regenerate-button {
+  margin-top: 10px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #a0a0a0;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: color 0.2s ease;
+}
+
+.regenerate-button:hover:not(.disabled) {
+  color: var(--primary);
+}
+
+.regenerate-button.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

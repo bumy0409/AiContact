@@ -33,7 +33,8 @@ public class AiChildImagenService {
 
         String prompt = "Create an ultra-cute Apple Memoji-style 3D baby character sitting pose facing directly forward toward the camera with a gentle smile. Generate the child of two people with "
                 + attributes
-                + "incorporating these parental traits subtly. The baby has large expressive brown eyes, chubby round face, short straight smooth black hair (not curly or wrinkled), and East Asian features with fair porcelain-white baby skin. Baby proportions with big head and chubby limbs. Clean 3D cartoon style with beautiful unified pastel gradient background in soft pink and blue tones, not split in half.";
+                + "incorporating these parental traits subtly. The baby has large expressive brown eyes, chubby round face, short straight smooth black hair (not curly or wrinkled), and East Asian features with fair porcelain-white baby skin. Baby proportions with big head and chubby limbs. Clean 3D cartoon style with beautiful unified pastel gradient background in soft pink and blue tones, not split in half."
+                + "And Please make only one child in the picture! There should be only One Baby Charater in the final picture";
 
         JSONObject payload = new JSONObject()
                 .put("model", "dall-e-3")

@@ -26,6 +26,11 @@ export const aiChildApi = {
       method: "GET",
     }),
 
+  regenerateImage: (id: number) =>
+    apiFetch<ApiResponse<AiChildResponse>>(`${BASE_PATH}/${id}/regenerate-image`, {
+      method: "POST",
+    }),
+
   deleteChild: (id: number) =>
     apiFetch<ApiResponse<string>>(`${BASE_PATH}/${id}`, {
       method: "DELETE",

@@ -7,8 +7,9 @@ interface BabyAvatarProps {
   imageUrl: string;
   canGrow?: boolean;
   onGrowClick?: () => void;
+  onRegenerateClick?: () => void;
   imgVersion?: number;
-  isProcessing?: boolean; // 처리 중 여부
+  isProcessing?: boolean;
 }
 
 export default function BabyAvatar({
@@ -16,8 +17,9 @@ export default function BabyAvatar({
   imageUrl,
   canGrow = false,
   onGrowClick,
+  onRegenerateClick,
   imgVersion = 1,
-  isProcessing = false, // 기본 false
+  isProcessing = false,
 }: BabyAvatarProps) {
   const navigate = useNavigate();
 
@@ -40,10 +42,8 @@ export default function BabyAvatar({
 
           {canGrow ? (
             <button
-              className={`talk-button grow-button ${
-                isProcessing ? "disabled" : ""
-              }`} // 스타일링용 클래스
-              onClick={isProcessing ? undefined : onGrowClick} // 처리 중엔 클릭 막기
+              className={`talk-button grow-button ${isProcessing ? "disabled" : ""}`}
+              onClick={isProcessing ? undefined : onGrowClick}
               disabled={isProcessing}
             >
               {isProcessing ? "성장 중..." : "🌱 성장하기"}
@@ -53,6 +53,15 @@ export default function BabyAvatar({
               <TalkIcon />
               <div>이야기하기</div>
             </div>
+          )}
+          {onRegenerateClick && (
+            <button
+              className={`regenerate-button ${isProcessing ? "disabled" : ""}`}
+              onClick={isProcessing ? undefined : onRegenerateClick}
+              disabled={isProcessing}
+            >
+              {isProcessing ? "생성 중..." : "🔄 이미지 재생성"}
+            </button>
           )}
         </div>
       </div>

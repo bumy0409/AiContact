@@ -99,6 +99,21 @@ public class AiChildService {
     }
 
     @Transactional
+    public AiChildEntity regenerateImage(Long id) throws IOException {
+        AiChildEntity child = childRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("AiChild not found: " + id));
+
+        CoupleEntity couple = child.getCouple();
+        String url1 = couple.getUser1().getProfileImageUrl();
+        String url2 = couple.getUser2().getProfileImageUrl();
+
+        String attributes = gptScenarioService.getAppearanceAttributes(url1, url2);
+        String imageUrl = imagenService.uploadAiChildImageToS3(attributes, couple.getId());
+        child.setImageUrl(imageUrl);
+        return childRepo.save(child);
+    }
+
+    @Transactional
     public AiChildEntity growChild(Long id) throws IOException {
         AiChildEntity child = childRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("AiChild not found: " + id));
