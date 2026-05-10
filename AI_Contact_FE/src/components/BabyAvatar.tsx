@@ -40,6 +40,16 @@ export default function BabyAvatar({
             className="baby-image"
           />
 
+          {onRegenerateClick && (
+            <button
+              className={`talk-button talk-button--left ${isProcessing ? "disabled" : ""}`}
+              onClick={isProcessing ? undefined : onRegenerateClick}
+              disabled={isProcessing}
+            >
+              {isProcessing ? "생성 중..." : "아이 재탄생"}
+            </button>
+          )}
+
           {canGrow ? (
             <button
               className={`talk-button grow-button ${isProcessing ? "disabled" : ""}`}
@@ -53,15 +63,6 @@ export default function BabyAvatar({
               <TalkIcon />
               <div>이야기하기</div>
             </div>
-          )}
-          {onRegenerateClick && (
-            <button
-              className={`regenerate-button ${isProcessing ? "disabled" : ""}`}
-              onClick={isProcessing ? undefined : onRegenerateClick}
-              disabled={isProcessing}
-            >
-              {isProcessing ? "생성 중..." : "🔄 이미지 재생성"}
-            </button>
           )}
         </div>
       </div>
