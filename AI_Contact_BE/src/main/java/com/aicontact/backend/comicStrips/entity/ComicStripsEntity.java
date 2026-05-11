@@ -2,6 +2,7 @@ package com.aicontact.backend.comicStrips.entity;
 
 import com.aicontact.backend.couple.entity.CoupleEntity;
 import com.aicontact.backend.global.entity.BaseTimeEntity;
+import com.aicontact.backend.user.entity.UserEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,10 +31,13 @@ public class ComicStripsEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // couples 테이블의 id를 외래키로 매핑
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "couple_id", nullable = false, foreignKey = @ForeignKey(name = "fk_comic_strips_couple"))
     private CoupleEntity couple;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "creator_id", nullable = false)
+    private UserEntity creator;
 
     @Column(name = "image_url", length = 500)
     private String imageUrl;

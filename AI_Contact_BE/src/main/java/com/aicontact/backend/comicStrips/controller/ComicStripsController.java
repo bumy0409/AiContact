@@ -41,10 +41,13 @@ public class ComicStripsController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody CreateComicStripsRequest req) throws IOException {
         String myEmail = userDetails.getUserEntity().getEmail();
-        Long coupleId = userService.getUserByEmail(myEmail).getCoupleId();
+        var me = userService.getUserByEmail(myEmail);
+        Long coupleId = me.getCoupleId();
+        Long userId = me.getId();
 
         ComicStripsEntity created = comicStripsService.createComicStrips(
                 coupleId,
+                userId,
                 req.getLocation(),
                 req.getActivity(),
                 req.getWeather());

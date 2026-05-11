@@ -10,6 +10,8 @@ import com.aicontact.backend.comicStrips.entity.ComicStripsEntity;
 import com.aicontact.backend.comicStrips.repository.ComicStripsRepository;
 import com.aicontact.backend.couple.entity.CoupleEntity;
 import com.aicontact.backend.couple.repository.CoupleRepository;
+import com.aicontact.backend.user.entity.UserEntity;
+import com.aicontact.backend.user.repository.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -22,15 +24,19 @@ public class ComicStripsService {
 
     private final ComicStripsRepository comicStripsRepo;
     private final CoupleRepository coupleRepo;
+    private final UserRepository userRepo;
     private final ComicStripsImagenService imagenService;
 
     @Transactional
-    public ComicStripsEntity createComicStrips(Long coupleId, String location, String activity, String weather)
+    public ComicStripsEntity createComicStrips(Long coupleId, Long userId, String location, String activity, String weather)
             throws IOException {
         CoupleEntity couple = coupleRepo.findById(coupleId)
                 .orElseThrow(() -> new EntityNotFoundException("Couple not found: " + coupleId));
+        UserEntity creator = userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
         ComicStripsEntity comicStrips = new ComicStripsEntity();
         comicStrips.setCouple(couple);
+        comicStrips.setCreator(creator);
 
         // 이미지 생성 및 업로드
         String imageUrl = imagenService.uploadComicStripsImageToS3(location, activity, weather, coupleId);
