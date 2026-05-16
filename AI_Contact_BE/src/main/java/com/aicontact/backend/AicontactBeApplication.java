@@ -13,7 +13,6 @@ public class AicontactBeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AicontactBeApplication.class, args);
 		//웹훅테스트
-		//브랜치웹훅테스트
 	}
 
 }
