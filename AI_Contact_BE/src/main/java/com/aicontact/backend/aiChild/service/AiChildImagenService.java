@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -40,8 +39,7 @@ public class AiChildImagenService {
                 .put("model", "dall-e-3")
                 .put("prompt", prompt)
                 .put("n", 1)
-                .put("size", "1024x1024")
-                .put("response_format", "b64_json");
+                .put("size", "1024x1024");
 
         Request request = new Request.Builder()
                 .url(ENDPOINT)
@@ -51,18 +49,19 @@ public class AiChildImagenService {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
-                String err = response.body() != null
-                        ? response.body().string()
-                        : "(empty)";
-                throw new IOException("Image API failed: "
-                        + response.code() + " / " + err);
+                String err = response.body() != null ? response.body().string() : "(empty)";
+                throw new IOException("Image API failed: " + response.code() + " / " + err);
             }
 
             JSONObject resJson = new JSONObject(response.body().string());
-            String base64 = resJson.getJSONArray("data").getJSONObject(0).getString("b64_json");
+            String imageUrl = resJson.getJSONArray("data").getJSONObject(0).getString("url");
 
-            byte[] imageBytes = Base64.getDecoder().decode(base64);
-            return new AiChildImage(imageBytes, "image/png");
+            Request imageRequest = new Request.Builder().url(imageUrl).build();
+            try (Response imageResponse = client.newCall(imageRequest).execute()) {
+                if (!imageResponse.isSuccessful() || imageResponse.body() == null)
+                    throw new IOException("이미지 다운로드 실패: " + imageUrl);
+                return new AiChildImage(imageResponse.body().bytes(), "image/png");
+            }
         }
     }
 
@@ -79,8 +78,7 @@ public class AiChildImagenService {
                 .put("model", "dall-e-3")
                 .put("prompt", prompt)
                 .put("n", 1)
-                .put("size", "1024x1024")
-                .put("response_format", "b64_json");
+                .put("size", "1024x1024");
 
         Request request = new Request.Builder()
                 .url(ENDPOINT)
@@ -90,18 +88,19 @@ public class AiChildImagenService {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
-                String err = response.body() != null
-                        ? response.body().string()
-                        : "(empty)";
-                throw new IOException("Image API failed: "
-                        + response.code() + " / " + err);
+                String err = response.body() != null ? response.body().string() : "(empty)";
+                throw new IOException("Image API failed: " + response.code() + " / " + err);
             }
 
             JSONObject resJson = new JSONObject(response.body().string());
-            String base64 = resJson.getJSONArray("data").getJSONObject(0).getString("b64_json");
+            String imageUrl = resJson.getJSONArray("data").getJSONObject(0).getString("url");
 
-            byte[] imageBytes = Base64.getDecoder().decode(base64);
-            return new AiChildImage(imageBytes, "image/png");
+            Request imageRequest = new Request.Builder().url(imageUrl).build();
+            try (Response imageResponse = client.newCall(imageRequest).execute()) {
+                if (!imageResponse.isSuccessful() || imageResponse.body() == null)
+                    throw new IOException("이미지 다운로드 실패: " + imageUrl);
+                return new AiChildImage(imageResponse.body().bytes(), "image/png");
+            }
         }
     }
 

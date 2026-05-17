@@ -70,8 +70,7 @@ public class ComicStripsImagenService {
                 .put("model", "dall-e-3")
                 .put("prompt", prompt)
                 .put("n", 1)
-                .put("size", "1024x1024")
-                .put("response_format", "b64_json");
+                .put("size", "1024x1024");
 
         Request request = new Request.Builder()
                 .url(ENDPOINT)
@@ -86,8 +85,15 @@ public class ComicStripsImagenService {
             }
 
             JSONObject resJson = new JSONObject(response.body().string());
-            String base64 = resJson.getJSONArray("data").getJSONObject(0).getString("b64_json");
-            return Base64.getDecoder().decode(base64);
+            String imageUrl = resJson.getJSONArray("data").getJSONObject(0).getString("url");
+
+            Request imageRequest = new Request.Builder().url(imageUrl).build();
+            try (Response imageResponse = client.newCall(imageRequest).execute()) {
+                if (!imageResponse.isSuccessful() || imageResponse.body() == null) {
+                    throw new IOException("이미지 다운로드 실패: " + imageUrl);
+                }
+                return imageResponse.body().bytes();
+            }
         }
 
     }
