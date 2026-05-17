@@ -1,6 +1,7 @@
 package com.aicontact.backend.comicStrips.service;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +19,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+
 @Service
 public class ComicStripsImagenService {
 
@@ -30,7 +32,7 @@ public class ComicStripsImagenService {
     @Autowired
     private S3StorageService s3StorageService;
 
-    public String generateImage(String location, String activity, String weather) throws IOException {
+    public byte[] generateImage(String location, String activity, String weather) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
                 .readTimeout(60, TimeUnit.SECONDS)
                 .build();
@@ -69,7 +71,7 @@ public class ComicStripsImagenService {
                 .put("prompt", prompt)
                 .put("n", 1)
                 .put("size", "1024x1024")
-                .put("response_format", "url");
+                .put("response_format", "b64_json");
 
         Request request = new Request.Builder()
                 .url(ENDPOINT)
@@ -84,12 +86,12 @@ public class ComicStripsImagenService {
             }
 
             JSONObject resJson = new JSONObject(response.body().string());
-            return resJson.getJSONArray("data").getJSONObject(0).getString("url");
+            String base64 = resJson.getJSONArray("data").getJSONObject(0).getString("b64_json");
+            return Base64.getDecoder().decode(base64);
         }
 
     }
 
-    // 디코딩된 바이트와 mimeType을 S3에 업로드하고 DB에 저장
     @Transactional
     public String uploadComicStripsImageToS3(
             String location,
@@ -97,36 +99,10 @@ public class ComicStripsImagenService {
             String weather,
             Long coupleId) throws IOException {
 
-        // 1. 이미지 URL 생성
-        String imageUrl = generateImage(location, activity, weather);
-
-        // 2. 이미지 다운로드
-        OkHttpClient client = new OkHttpClient();
-        Request imageRequest = new Request.Builder().url(imageUrl).build();
-
-        try (Response imageResponse = client.newCall(imageRequest).execute()) {
-            if (!imageResponse.isSuccessful() || imageResponse.body() == null) {
-                throw new IOException("이미지 다운로드 실패: " + imageUrl);
-            }
-
-            byte[] imageBytes = imageResponse.body().bytes();
-            String contentType = imageResponse.body().contentType().toString();
-
-            // 3. 확장자 결정
-            String extension = switch (contentType) {
-                case "image/jpeg" -> "jpg";
-                case "image/webp" -> "webp";
-                case "image/png" -> "png";
-                default -> "bin";
-            };
-
-            // 4. S3 키 생성
-            String uuid = UUID.randomUUID().toString();
-            String key = String.format("media/couple/%d/%s.%s", coupleId, uuid, extension);
-
-            // 5. S3에 업로드
-            return s3StorageService.upload(imageBytes, key, contentType);
-        }
+        byte[] imageBytes = generateImage(location, activity, weather);
+        String uuid = UUID.randomUUID().toString();
+        String key = String.format("media/couple/%d/%s.png", coupleId, uuid);
+        return s3StorageService.upload(imageBytes, key, "image/png");
     }
 
     @Transactional
