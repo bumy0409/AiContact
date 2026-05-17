@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -36,7 +37,7 @@ public class AiChildImagenService {
                 + "And Please make only one child in the picture! There should be only One Baby Charater in the final picture";
 
         JSONObject payload = new JSONObject()
-                .put("model", "dall-e-3")
+                .put("model", "gpt-image-1")
                 .put("prompt", prompt)
                 .put("n", 1)
                 .put("size", "1024x1024");
@@ -54,14 +55,8 @@ public class AiChildImagenService {
             }
 
             JSONObject resJson = new JSONObject(response.body().string());
-            String imageUrl = resJson.getJSONArray("data").getJSONObject(0).getString("url");
-
-            Request imageRequest = new Request.Builder().url(imageUrl).build();
-            try (Response imageResponse = client.newCall(imageRequest).execute()) {
-                if (!imageResponse.isSuccessful() || imageResponse.body() == null)
-                    throw new IOException("이미지 다운로드 실패: " + imageUrl);
-                return new AiChildImage(imageResponse.body().bytes(), "image/png");
-            }
+            String base64 = resJson.getJSONArray("data").getJSONObject(0).getString("b64_json");
+            return new AiChildImage(Base64.getDecoder().decode(base64), "image/png");
         }
     }
 
@@ -75,7 +70,7 @@ public class AiChildImagenService {
                 + "and maintain the same gender as the original child but keep it very simple and minimal. The child has large expressive round eyes, less chubby but still round face showing growth, short neat hair like Apple emoji style, and East Asian features with fair skin. Age-appropriate Apple Memoji proportions with slightly smaller head-to-body ratio than baby, longer limbs showing growth. Pure Apple iOS emoji aesthetic with smooth simplified 3D rendering and unified pastel gradient background in soft pink and blue tones, not split in half.";
 
         JSONObject payload = new JSONObject()
-                .put("model", "dall-e-3")
+                .put("model", "gpt-image-1")
                 .put("prompt", prompt)
                 .put("n", 1)
                 .put("size", "1024x1024");
@@ -93,14 +88,8 @@ public class AiChildImagenService {
             }
 
             JSONObject resJson = new JSONObject(response.body().string());
-            String imageUrl = resJson.getJSONArray("data").getJSONObject(0).getString("url");
-
-            Request imageRequest = new Request.Builder().url(imageUrl).build();
-            try (Response imageResponse = client.newCall(imageRequest).execute()) {
-                if (!imageResponse.isSuccessful() || imageResponse.body() == null)
-                    throw new IOException("이미지 다운로드 실패: " + imageUrl);
-                return new AiChildImage(imageResponse.body().bytes(), "image/png");
-            }
+            String base64 = resJson.getJSONArray("data").getJSONObject(0).getString("b64_json");
+            return new AiChildImage(Base64.getDecoder().decode(base64), "image/png");
         }
     }
 
