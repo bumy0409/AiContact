@@ -82,6 +82,9 @@ public class SecurityConfig {
                 // 에러 페이지 허용
                 .requestMatchers("/error").permitAll()
 
+                // Prometheus 모니터링 허용
+                .requestMatchers("/actuator/**").permitAll()
+
                 // baby chat 경로 허용
                 .requestMatchers("/chat/**").permitAll()
                 .requestMatchers("/summary/**").permitAll()
