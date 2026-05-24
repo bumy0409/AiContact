@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.aicontact.backend.comicStrips.entity.ComicStripsEntity;
 import com.aicontact.backend.comicStrips.repository.ComicStripsRepository;
@@ -41,8 +43,15 @@ public class ComicStripsService {
         comicStripsRepo.save(comicStrips);
 
         // 백그라운드에서 이미지 생성
-        asyncService.markProcessing(comicStrips.getId());
-        asyncService.generateImageAsync(comicStrips.getId(), location, activity, weather, coupleId);
+        // 트랜잭션 커밋 이후에 async 실행 → findById 타이밍 문제 방지
+        final Long comicStripsId = comicStrips.getId();
+        asyncService.markProcessing(comicStripsId);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                asyncService.generateImageAsync(comicStripsId, location, activity, weather, coupleId);
+            }
+        });
 
         return comicStrips;
     }
