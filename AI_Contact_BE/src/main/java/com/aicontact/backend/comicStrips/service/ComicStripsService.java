@@ -1,6 +1,5 @@
 package com.aicontact.backend.comicStrips.service;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -26,23 +25,26 @@ public class ComicStripsService {
     private final CoupleRepository coupleRepo;
     private final UserRepository userRepo;
     private final ComicStripsImagenService imagenService;
+    private final ComicStripsAsyncService asyncService;
 
     @Transactional
-    public ComicStripsEntity createComicStrips(Long coupleId, Long userId, String location, String activity, String weather)
-            throws IOException {
+    public ComicStripsEntity createComicStrips(Long coupleId, Long userId, String location, String activity, String weather) {
         CoupleEntity couple = coupleRepo.findById(coupleId)
                 .orElseThrow(() -> new EntityNotFoundException("Couple not found: " + coupleId));
         UserEntity creator = userRepo.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+
+        // 엔티티 먼저 저장 (imageUrl은 null)
         ComicStripsEntity comicStrips = new ComicStripsEntity();
         comicStrips.setCouple(couple);
         comicStrips.setCreator(creator);
+        comicStripsRepo.save(comicStrips);
 
-        // 이미지 생성 및 업로드
-        String imageUrl = imagenService.uploadComicStripsImageToS3(location, activity, weather, coupleId);
-        comicStrips.setImageUrl(imageUrl);
+        // 백그라운드에서 이미지 생성
+        asyncService.markProcessing(comicStrips.getId());
+        asyncService.generateImageAsync(comicStrips.getId(), location, activity, weather, coupleId);
 
-        return comicStripsRepo.save(comicStrips);
+        return comicStrips;
     }
 
     @Transactional

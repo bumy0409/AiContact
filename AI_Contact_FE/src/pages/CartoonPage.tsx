@@ -58,16 +58,34 @@ export default function CartoonPage() {
     try {
       setIsLoading(true);
       const res = await ComicStripsApi.create({ location, activity, weather });
-      navigate("/cartoon-result", {
-        state: {
-          imageUrl: res.data.imageUrl,
-          id: res.data.id,
-        },
-      });
+      const comicId = res.data.id;
+
+      // 3초마다 상태 폴링
+      const poll = async () => {
+        try {
+          const statusRes = await ComicStripsApi.getStatus(comicId);
+          const { status, imageUrl } = statusRes.data;
+
+          if (status === "DONE" && imageUrl) {
+            navigate("/cartoon-result", {
+              state: { imageUrl, id: comicId },
+            });
+          } else if (status === "FAILED") {
+            alert("만화 생성 중 오류가 발생했습니다.");
+            setIsLoading(false);
+          } else {
+            setTimeout(poll, 3000);
+          }
+        } catch {
+          alert("상태 확인 중 오류가 발생했습니다.");
+          setIsLoading(false);
+        }
+      };
+
+      setTimeout(poll, 3000);
     } catch (error) {
       console.error(error);
-      alert("만화 생성 중 오류가 발생했습니다.");
-    } finally {
+      alert("만화 생성 요청 중 오류가 발생했습니다.");
       setIsLoading(false);
     }
   };

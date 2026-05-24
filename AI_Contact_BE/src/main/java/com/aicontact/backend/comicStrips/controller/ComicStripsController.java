@@ -1,7 +1,7 @@
 package com.aicontact.backend.comicStrips.controller;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -22,6 +22,7 @@ import com.aicontact.backend.comicStrips.dto.request.UpdateComicStripsTitleReque
 import com.aicontact.backend.comicStrips.dto.response.ComicStripsListResponse;
 import com.aicontact.backend.comicStrips.dto.response.ComicStripsResponse;
 import com.aicontact.backend.comicStrips.entity.ComicStripsEntity;
+import com.aicontact.backend.comicStrips.service.ComicStripsAsyncService;
 import com.aicontact.backend.comicStrips.service.ComicStripsService;
 import com.aicontact.backend.global.dto.response.ApiResponse;
 import com.aicontact.backend.user.service.UserService;
@@ -34,12 +35,18 @@ import lombok.RequiredArgsConstructor;
 public class ComicStripsController {
 
     private final ComicStripsService comicStripsService;
+    private final ComicStripsAsyncService asyncService;
     private final UserService userService;
+
+    @GetMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getStatus(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(ApiResponse.success(asyncService.getStatus(id)));
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<ComicStripsResponse>> createComicStrips(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody CreateComicStripsRequest req) throws IOException {
+            @RequestBody CreateComicStripsRequest req) {
         String myEmail = userDetails.getUserEntity().getEmail();
         var me = userService.getUserByEmail(myEmail);
         Long coupleId = me.getCoupleId();

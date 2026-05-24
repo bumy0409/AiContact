@@ -25,6 +25,12 @@ export const ComicStripsApi = {
   getList: () =>
     apiFetch<ApiResponse<ComicStripsListResponse[]>>("/comic/list"),
 
+  /* 만화 생성 상태 조회 */
+  getStatus: (id: number) =>
+    apiFetch<ApiResponse<{ status: string; imageUrl?: string; title?: string }>>(
+      `/comic/${id}/status`
+    ),
+
   /* 만화 삭제 (본인 커플 소유권 확인됨) */
   delete: (id: number) =>
     apiFetch<ApiResponse<string>>(`/comic/${id}`, {
